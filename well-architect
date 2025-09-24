@@ -1,0 +1,112 @@
+Nguồn 1: Nguyên tắc Thiết kế Bảo mật (Security)
+Bảo mật là nguyên tắc đầu tiên, nhằm bảo vệ tài nguyên trong đám mây và đảm bảo vận hành dịch vụ ổn định ngay cả khi bị tấn công từ bên ngoài.
+1. Khái niệm Bảo mật và CIA Triad
+Bảo mật thông tin là hoạt động nhằm ngăn chặn sự hư hỏng, thay đổi hoặc rò rỉ thông tin. Hoạt động bảo mật thường được thể hiện qua Bộ ba CIA (CIA Triad):
+• C (Confidentiality - Tính bảo mật): Chỉ những người được ủy quyền mới được phép truy cập dữ liệu hoặc ứng dụng.
+• I (Integrity - Tính toàn vẹn): Dữ liệu lưu trữ hoặc truyền tải giữa các hệ thống không được phép bị thay đổi hoặc rò rỉ trái phép.
+• A (Availability - Tính sẵn sàng): Dịch vụ đang hoạt động không bị gián đoạn ngay cả khi xảy ra vi phạm bảo mật.
+2. Đặc điểm Bảo mật Đám mây và Mô hình Trách nhiệm Chung
+Đặc điểm bảo mật chính của đám mây là sự mở rộng khu vực tin cậy từ hệ thống tại chỗ (on-premise) sang đám mây, bắt buộc phải đi qua internet. Internet được coi là một "khu rừng" đầy rủi ro dưới góc độ bảo mật.
+Trong môi trường đám mây, bảo mật tuân theo Mô hình Trách nhiệm Chung (Shared Responsibility Model):
+• Nhà cung cấp đám mây chịu trách nhiệm quản lý vật lý, chẳng hạn như máy chủ vật lý hoặc hypervisor (trong mô hình IaaS). Khu vực này đảm bảo tính sẵn sàng và ổn định cho người dùng.
+• Người dùng chịu trách nhiệm quản lý mọi thứ trong khu vực của họ, bao gồm hệ điều hành, kiểm soát mạng, ứng dụng, quản lý tài khoản, và dữ liệu. Người dùng phải áp dụng các khái niệm CIA cho các hoạt động bảo mật trong khu vực này.
+3. Nguyên tắc Thiết kế Bảo mật (Well-Architected)
+• Chính sách Phân quyền Dựa trên Vai trò (Role-Based Access Control - RBAC): Cần triển khai chính sách phân quyền chi tiết, gán quyền tối thiểu cần thiết cho từng vai trò (ví dụ: nhóm Phát triển, DBA, Bảo mật).
+• Quản lý Khóa Xác thực (Authentication Key): Khóa xác thực phải được quản lý nghiêm ngặt (hạn chế quyền tối thiểu, đặt thời hạn ngắn, giới hạn IP truy cập).
+• Bảo vệ Dữ liệu: Mã hóa là giải pháp tốt nhất để ngăn chặn rò rỉ thông tin. Đối với các cuộc tấn công thay đổi dữ liệu (như ransomware), sao lưu định kỳ là biện pháp hiệu quả để khôi phục trạng thái ban đầu.
+• Bảo vệ khi Truyền Dữ liệu: Sử dụng các kết nối bảo mật như VPN, Direct Connect, hoặc giao thức SSL/TLS cho truyền tải web.
+• Áp dụng Bảo mật cho Mọi Tài nguyên: Sử dụng VPC (Virtual Private Network) để bảo vệ tài nguyên. Tài nguyên quan trọng nên được đặt trong Private Subnet để ngăn truy cập trực tiếp từ bên ngoài. Có thể triển khai Bastion Server trong Subnet công cộng để quản lý tài nguyên trong Private Subnet. Sử dụng Bảo vệ Đa tầng (Multi-layered Defense) bằng cách kiểm soát lưu lượng mạng qua Security Group (ví dụ: chỉ mở cổng 8080 cho máy chủ ứng dụng và 3306 cho cơ sở dữ liệu).
+• Giám sát và Theo dõi Chủ động: Áp dụng các dịch vụ bảo mật (như DDoS Protection, WAF) và thực hiện giám sát tích hợp (Security Monitoring). Kích hoạt ghi nhật ký (logging) để phân tích dấu hiệu truy cập bất thường.
+• Bảo mật cấp Ứng dụng và Hệ điều hành: Duy trì hình ảnh máy chủ ảo (Virtual Server Image) ở trạng thái tốt nhất (vá lỗi HĐH, cập nhật ứng dụng) để sử dụng cho việc thay thế máy chủ khi xảy ra sự cố hoặc cho Auto Scaling.
+• Phản ứng Nhanh chóng với Sự cố: Tận dụng tính năng của đám mây, chẳng hạn như sử dụng Auto Scaling để mở rộng máy chủ ảo khi lưu lượng truy cập tăng do tấn công DDoS, sau đó thông báo cho quản trị viên để chặn IP tấn công.
+
+--------------------------------------------------------------------------------
+Nguồn 2: Nguyên tắc Thiết kế Tính sẵn sàng (Availability)
+Tính sẵn sàng là khả năng cung cấp các chức năng và hiệu suất đáp ứng kỳ vọng của người dùng khi họ cố gắng sử dụng tài nguyên hoặc dịch vụ CNTT.
+1. Khái niệm và Chỉ số
+• Tính sẵn sàng cao (High Availability - HA): Dịch vụ phải "sống" khi được truy cập, phản hồi với tốc độ bình thường, và không thiếu các chức năng mong muốn.
+• Tỷ lệ sẵn sàng (Availability Rate): Chỉ số đo lường mức độ sẵn sàng, thường được thể hiện bằng "số 9" (Nines), ví dụ: 99.9% là 3 Nines. Tỷ lệ này cho biết thời gian gián đoạn tối đa dự kiến, ví dụ: 5 Nines (99.999%) tương đương với khoảng 22 phút gián đoạn trong một tháng.
+2. Các Yếu tố Ảnh hưởng đến Tính sẵn sàng (Khu vực Người dùng quản lý)
+Các yếu tố ảnh hưởng đến tính sẵn sàng do người dùng kiểm soát bao gồm:
+• Thiết kế và Vận hành Ứng dụng không phù hợp với đặc tính đám mây.
+• Tấn công độc hại từ bên ngoài (ví dụ: DDoS).
+• Kết nối mạng giữa người dùng và đám mây.
+• Tăng đột biến yêu cầu của người dùng (ví dụ: do sự kiện quảng cáo hoặc sự kiện nổi tiếng).
+3. Nguyên tắc Thiết kế Tính sẵn sàng (Well-Architected)
+Nguyên tắc cơ bản để đạt được HA là đặt thêm một máy chủ thực hiện cùng một vai trò.
+• Sử dụng Dịch vụ Được Quản lý (Managed Services): Việc sử dụng các dịch vụ được quản lý (PaaS, SaaS) của nhà cung cấp đám mây thường mang lại mức độ sẵn sàng cao hơn so với việc triển khai giải pháp trên máy chủ ảo (IaaS).
+• Mở rộng Nhanh chóng bằng Auto Scaling: Auto Scaling là công cụ tốt nhất để phản ứng tức thì với sự cố hoặc tăng tải. Cần xem xét giới hạn số lượng máy chủ ảo có thể tạo (quota) và thiết lập số lượng máy chủ mục tiêu thấp hơn 100% công suất để đảm bảo dịch vụ không bị gián đoạn trong khi máy chủ mới được tạo.
+• Thiết kế Ứng dụng Đã được Tách Ghép (Decoupling): Cấu trúc ứng dụng nên được thiết kế để hỗ trợ mở rộng. Cấu trúc bị ghép nối (Coupling), nơi máy chủ giao tiếp bằng địa chỉ IP tĩnh, sẽ không tận dụng được khả năng mở rộng của Auto Scaling. Giải pháp là Tách Ghép (Decoupling) bằng cách đặt Load Balancer hoặc Message Queue giữa các tầng.
+• Quản lý Trạng thái (State Management): Ứng dụng nên được triển khai ở chế độ không lưu trạng thái (stateless). Thay vì lưu trữ yêu cầu trong bộ nhớ máy chủ (gây quá tải khi Auto Scaling), yêu cầu người dùng nên được lưu trữ trong cơ sở dữ liệu quản lý trạng thái (thường là NoSQL hoặc Redis In-Memory DB).
+• Sử dụng Kiến trúc Cloud Native: Microservices Architecture (MSA) là kiến trúc phản ánh tốt nhất đặc tính đám mây, giúp tăng tính sẵn sàng bằng cách đảm bảo sự cố ở một dịch vụ không ảnh hưởng đến toàn bộ hệ thống.
+• Sử dụng Dịch vụ Serverless: Các dịch vụ Serverless (ví dụ: Object Storage cho nội dung tĩnh, Serverless Function) giúp giảm gánh nặng quản lý dung lượng và mở rộng, đồng thời tăng tính sẵn sàng vì chúng được quản lý và chịu trách nhiệm bởi nhà cung cấp đám mây.
+• Mở rộng sang Đám mây (Hybrid Cloud): Tăng tính sẵn sàng cho hệ thống On-premise bằng cách sử dụng GSLB (Global Server Load Balancing) để phân tán tải sang đám mây khi máy chủ tại chỗ bị quá tải.
+
+--------------------------------------------------------------------------------
+Nguồn 3: Nguyên tắc Thiết kế Tính ổn định (Stability/Resilience)
+Tính ổn định là khả năng khởi động lại dịch vụ CNTT và khôi phục dữ liệu đến mức mục tiêu khi xảy ra các sự cố hoặc thảm họa không lường trước. Nguyên tắc này bắt nguồn từ tiền đề rằng mọi thiết bị CNTT đều sẽ hỏng.
+1. Chỉ số Đo lường Tính ổn định
+Các chỉ số dùng để đặt mức độ ổn định cho kiến trúc:
+• RTO (Recovery Time Objective): Mục tiêu thời gian phục hồi. Là khoảng thời gian mục tiêu để khôi phục dịch vụ sau khi xảy ra sự cố. RTO gần bằng 0 đòi hỏi đầu tư lớn (ví dụ: xây dựng thêm một trang web hoạt động).
+• RPO (Recovery Point Objective): Mục tiêu điểm phục hồi. Là khoảng thời gian mất dữ liệu tối đa chấp nhận được. RPO phụ thuộc vào phương thức lưu bản sao dữ liệu (sao chép đồng bộ/bất đồng bộ hoặc sao lưu định kỳ).
+2. Chiến lược Phục hồi Thảm họa (DR) trên Đám mây
+Đám mây giúp tăng mức độ ổn định vì có thể tạo và mở rộng tài nguyên nhanh chóng, cho phép triển khai nhiều mức RTO/RPO khác nhau với chi phí linh hoạt hơn so với On-premise.
+• Sao lưu (Backup): Cấp độ cơ bản nhất, tập trung vào việc lưu trữ bản sao dữ liệu (ví dụ: sử dụng Object Storage ở một Region khác). RTO/RPO lớn nhất, chi phí thấp nhất.
+• Cold DR Site: Cấu hình máy chủ DR tương tự như trang chính nhưng dừng hoạt động. Dữ liệu được sao chép bất đồng bộ. Khi sự cố xảy ra, quản trị viên khởi động máy chủ (Web, WAS) và nâng cấp dung lượng DB (nếu cần), sau đó GSLB sẽ chuyển hướng yêu cầu. Mô hình này tận dụng ưu điểm khởi động nhanh của đám mây để đạt RTO tương đối thấp với chi phí vận hành thấp.
+• Warm DR Site: Máy chủ DR đang chạy ở cấu hình dung lượng nhỏ. Khi sự cố xảy ra, chỉ cần nâng cấp dung lượng máy chủ và chuyển hướng yêu cầu bằng GSLB. Mô hình này đạt được RTO/RPO rất thấp (gần thời gian thực) nhưng đòi hỏi chi phí đầu tư và duy trì cao hơn.
+3. Nguyên tắc Thiết kế Tính ổn định (Well-Architected)
+• Phân tán Chức năng và Tăng Khả năng Phục hồi: Tránh Single Point of Failure (Điểm lỗi đơn lẻ). Phân tán chức năng ra nhiều máy chủ đơn giản giúp giảm thời gian sao lưu và khôi phục, tăng tính ổn định.
+• Sao lưu Tất cả Tài nguyên: Quản lý Custom Images của máy chủ ảo ở trạng thái mới nhất. Sao lưu định kỳ máy chủ ảo, dữ liệu cơ sở dữ liệu, và sử dụng Snapshot cho File Storage. Sử dụng Quản lý Phiên bản (Versioning) và Sao chép (Replication) cho Object Storage.
+• Quản lý Tài nguyên bằng Template và Tự động hóa: Tự động hóa việc triển khai tài nguyên (bằng CLI/Open API) để giảm thời gian phục hồi và giảm lỗi thủ công.
+• Phân tán Tài nguyên qua Nhiều Vùng sẵn sàng (Availability Zones - AZs): AZs là các cụm trung tâm dữ liệu được cách ly vật lý trong cùng một Region, giúp dịch vụ tiếp tục hoạt động nếu một AZ gặp sự cố ở cấp độ vật lý hoặc hypervisor.
+• Thực hiện Game Day Định kỳ: Định kỳ mô phỏng sự cố (Game Day) theo kịch bản đã lên kế hoạch để kiểm tra các quy trình phục hồi và phát hiện những thay đổi cấu hình chưa được phản ánh trong quy trình.
+
+--------------------------------------------------------------------------------
+Nguồn 4: Nguyên tắc Thiết kế Hiệu suất Hiệu quả (Performance Efficiency)
+Hiệu suất Hiệu quả tập trung vào việc điều chỉnh tổng thể hiệu suất theo sự thay đổi của tải (Load) để cải thiện trải nghiệm của người dùng cuối. Điều này khác với việc tối ưu hóa hiệu suất đơn vị (ví dụ: tốc độ CPU) như trong môi trường truyền thống.
+1. Khái niệm và Bối cảnh
+Hiệu suất thường mang tính chủ quan ("chậm"), nhưng việc chậm trễ (Latency) ảnh hưởng trực tiếp đến doanh thu. Trong đám mây, mục tiêu là cải thiện hiệu suất trên toàn bộ dịch vụ.
+Các lĩnh vực cần cải thiện hiệu suất bao gồm:
+• Độ trễ (Latency): Thời gian trễ.
+• Thông lượng (Throughput): Lượng dữ liệu được truyền tải/xử lý trong một khoảng thời gian nhất định.
+2. Chiến lược Cải thiện Hiệu suất
+• Giảm Độ trễ:
+    ◦ Giảm khoảng cách vật lý: Sử dụng CDN (Content Delivery Network) và hạ tầng trung tâm dữ liệu toàn cầu của nhà cung cấp đám mây.
+    ◦ Tối ưu hóa tài nguyên máy chủ: Cần chú ý đến dung lượng bộ nhớ (Memory) vì bộ nhớ bị quá tải sẽ làm tăng việc sử dụng bộ nhớ ảo (Virtual Memory) trên đĩa, làm chậm phản hồi của máy chủ.
+    ◦ Giảm tải DB đọc: Sử dụng Read Replica (bản sao chỉ đọc) trong Dịch vụ Cơ sở dữ liệu để phân chia tải đọc, giúp cải thiện độ trễ đọc.
+• Tăng Thông lượng:
+    ◦ Băng thông mạng: Khi kết nối On-premise và đám mây, cần xác định băng thông cần thiết (ví dụ: sử dụng Direct Connect để đảm bảo băng thông ổn định).
+    ◦ Thông lượng lưu trữ: Lựa chọn lưu trữ có IOPS và thông lượng cao. Samsung Cloud Platform cung cấp SSD với hiệu suất lên tới 16.000 IOPS.
+    ◦ Tăng hiệu suất máy chủ đơn vị: Sử dụng Bare Metal Server hoặc HPC Clusters (High Performance Computing) cho các khối lượng công việc đòi hỏi hiệu suất tính toán cực cao (ví dụ: mô phỏng, Machine Learning quy mô lớn).
+3. Sử dụng Bộ nhớ Đệm (Caching)
+Caching là chiến lược quan trọng để cải thiện hiệu suất đọc.
+• CDN: Giảm tải cho máy chủ gốc và giảm độ trễ mạng.
+• In-Memory DB (Redis): Đặt bộ nhớ đệm cho dữ liệu thường xuyên được đọc từ cơ sở dữ liệu để đạt tốc độ trễ thấp hơn.
+• Nguyên tắc áp dụng Caching: Caching chỉ hiệu quả khi áp dụng cho dữ liệu được yêu cầu thường xuyên. Nếu dữ liệu ít được đọc, việc áp dụng caching có thể không mang lại lợi ích hiệu suất mà còn tăng chi phí.
+4. Nguyên tắc Thiết kế Hiệu suất Hiệu quả (Well-Architected)
+• Lựa chọn Loại Máy chủ (Server Type): Lựa chọn loại máy chủ phù hợp với đặc điểm của khối lượng công việc (Workload).
+• Sử dụng Cloud Native (Container): Container là dịch vụ điển hình của Cloud Native, mang lại hiệu quả chi phí và khả năng mở rộng nhanh chóng.
+• Lựa chọn Lưu trữ: Chọn loại lưu trữ dựa trên đặc tính truy cập dữ liệu (ví dụ: Block Storage cho truy cập ngẫu nhiên, File/Object Storage cho truy cập tuần tự).
+• Ưu tiên Dịch vụ Cơ sở dữ liệu được Quản lý (Managed DB Services): Các dịch vụ DB được quản lý (như MySQL, PostgreSQL) được tối ưu hóa để cung cấp hiệu suất tính toán tốt nhất và hỗ trợ các tính năng HA/Read Replica.
+• Tối ưu hóa Mạng: Sử dụng VPC Peering để giao tiếp giữa các VPC mà không cần qua mạng bên ngoài, tránh các đường dẫn không cần thiết.
+• Giám sát Liên tục: Đặt các sự kiện dựa trên ngưỡng (threshold-based events) cho các chỉ số hiệu suất để phản ứng nhanh và quan sát xu hướng tích lũy để điều chỉnh tài nguyên.
+
+--------------------------------------------------------------------------------
+Nguồn 5: Nguyên tắc Thiết kế Sự xuất sắc trong Vận hành (Operational Excellence)
+Sự xuất sắc trong vận hành là hoạt động nhằm duy trì chất lượng dịch vụ CNTT và cải tiến liên tục các chức năng để đáp ứng các yêu cầu kinh doanh và tuân thủ quy định.
+1. Đặc điểm Vận hành trên Đám mây
+Trong môi trường đám mây, cơ sở hạ tầng được triển khai dưới dạng phần mềm, cho phép vận hành hạ tầng bằng mã (Infrastructure as Code - IaC).
+• Tự động hóa: Cơ sở hạ tầng có thể được tự động hóa dựa trên các điều kiện cụ thể (ví dụ: tự động thêm máy chủ khi CPU vượt 70%). Tự động hóa giúp giảm lỗi thủ công.
+• Thí nghiệm Dễ dàng: Khả năng tạo và xóa tài nguyên nhanh chóng giúp việc thử nghiệm (experimentation) ít tốn kém, cho phép tìm ra các mẫu (patterns) vận hành hiệu quả.
+• DevOps: Trong môi trường đám mây, DevOps cho phép đạt được mục tiêu kép là tốc độ triển khai và tính ổn định.
+• Tối đa hóa Hiệu quả Vận hành: Ở cấp độ ứng dụng, hiệu quả vận hành đạt được thông qua triển khai pipeline (CI/CD); ở cấp độ hạ tầng, thông qua tự động hóa bằng Container (Microservices).
+2. Nguyên tắc Thiết kế Sự xuất sắc trong Vận hành (Well-Architected)
+• Thực hiện Tác vụ Vận hành bằng Mã (IaC):
+    ◦ Giảm thời gian: Triển khai hạ tầng phức tạp nhanh chóng bằng mã (CLI/Open API).
+    ◦ Ngăn ngừa lỗi thủ công: Tránh các lỗi phát sinh do thao tác thủ công phức tạp hoặc lặp đi lặp lại.
+    ◦ Hiểu Ràng buộc và Phụ thuộc: Mã hóa giúp nắm bắt được sự phụ thuộc giữa các tài nguyên, giảm thiểu lỗi khi thay đổi.
+    ◦ Lưu trữ Tài liệu: Mã và các tham số được sử dụng cần được lưu trữ làm tài liệu cơ sở để tạo tài nguyên mới hoặc thực hiện thay đổi.
+• Kích hoạt Giám sát, Theo dõi và Cảnh báo: Monitoring cung cấp các chỉ số khách quan; Security Monitoring cung cấp thông tin sự kiện bảo mật; Logging & Audit (Trail) ghi lại mọi thao tác được thực hiện trên nền tảng đám mây.
+• Thử nghiệm Quy mô nhỏ và Cải tiến Dần dần: Môi trường đám mây cho phép dễ dàng tạo máy chủ mới, áp dụng thay đổi (ví dụ: vá lỗi) và thay thế máy chủ cũ, hoặc dễ dàng quay lại trạng thái trước đó (rollback) nếu có vấn đề. Điều này hỗ trợ việc cải tiến liên tục.
+• Chuẩn bị cho Sự cố và Học hỏi từ Sự cố: Phân tích nguyên nhân sự cố. Xác định các điều kiện sự cố khách quan và cấu hình Alert (Cảnh báo) trong dịch vụ giám sát đám mây. Mã hóa (Code hóa) quy trình xử lý sự cố để đảm bảo phản ứng nhanh chóng.
+• Tự động hóa Vận hành: Tự động hóa các tác vụ đơn giản, lặp lại, hoặc các tác vụ khẩn cấp (như phản ứng với sự cố hoặc sự kiện bảo mật) bằng cách kích hoạt mã xử lý sự cố khi cảnh báo được phát ra.
